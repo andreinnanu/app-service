@@ -31,6 +31,11 @@ jobs:
     - name: Build and test app-service code
       working-directory: ./app_service
       run: |
+        ls -al
+
+    - name: Build and test app-service code
+      working-directory: ./app_service
+      run: |
         cargo build --verbose
         cargo test --verbose
 
