@@ -1,0 +1,55 @@
+name: Build, Test and Push container image
+# Trigger the workflow when changes are pushed to the main branch
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+      # Cache dependencies to speed up build times
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          app-service/.cargo
+          app-service/target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-
+
+    - name: Install Rust
+      run: rustup update stable && rustup default stable
+
+    - name: Build and test app-service code
+      working-directory: ./app-service
+      run: |
+        cargo build --verbose
+        cargo test --verbose
+
+      # Set up Docker Buildx for multi-platform builds
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # Build the Docker image
+    - name: Build Docker image
+      run: |
+        docker build -t andreinanu/app-service:latest .
+
+    # Push the Docker image to Docker Hub
+    - name: Push Docker image
+      run: |
+        docker push andreinanu/auth-service
