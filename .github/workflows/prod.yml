@@ -29,7 +29,6 @@ jobs:
       run: rustup update stable && rustup default stable
 
     - name: Build and test app-service code
-      working-directory: ./app-service
       run: |
         cargo build --verbose
         cargo test --verbose
