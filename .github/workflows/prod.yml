@@ -20,8 +20,8 @@ jobs:
       uses: actions/cache@v3
       with:
         path: |
-          app_service/.cargo
-          app_service/target/
+          app-service/.cargo
+          app-service/target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: ${{ runner.os }}-cargo-
 
@@ -29,12 +29,7 @@ jobs:
       run: rustup update stable && rustup default stable
 
     - name: Build and test app-service code
-      working-directory: ./app_service
-      run: |
-        ls -al
-
-    - name: Build and test app-service code
-      working-directory: ./app_service
+      working-directory: ./app-service
       run: |
         cargo build --verbose
         cargo test --verbose
@@ -57,4 +52,4 @@ jobs:
     # Push the Docker image to Docker Hub
     - name: Push Docker image
       run: |
-        docker push andreinanu/auth-service
+        docker push andreinanu/app-service
